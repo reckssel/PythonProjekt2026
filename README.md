@@ -99,7 +99,3 @@ python main.py
 | 3306  | MySQL     |
 | 3389  | RDP       |
 | 25565 | Minecraft |
-
-## Lizenz
-
-Dieses Projekt steht unter der MIT-Lizenz.
