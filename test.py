@@ -1,53 +1,39 @@
 import wx
-import socket
+import wx.grid as gridlib
+
+def get_data():
+    return [
+        ["Anna", 25, "Berlin"],
+        ["Max", 30, "Hamburg"],
+        ["Lisa", 22, "München"]
+    ]
 
 class MyFrame(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="Portscanner", size=(400, 250))
+        super().__init__(None, title="Tabelle Beispiel", size=(400, 300))
 
         panel = wx.Panel(self)
+        sizer = wx.BoxSizer(wx.VERTICAL)
 
-        vbox = wx.BoxSizer(wx.VERTICAL)
+        data = get_data()
 
-        # Eingabefelder
-        self.host = wx.TextCtrl(panel)
-        self.port = wx.TextCtrl(panel)
+        grid = gridlib.Grid(panel)
+        grid.CreateGrid(len(data), len(data[0]))
 
-        # Button
-        check = wx.Button(panel, label="Check")
-        check.Bind(wx.EVT_BUTTON, self.check_port)
+        # Spaltenüberschriften
+        grid.SetColLabelValue(0, "Name")
+        grid.SetColLabelValue(1, "Alter")
+        grid.SetColLabelValue(2, "Stadt")
 
-        # Layout (WICHTIG!)
-        vbox.Add(wx.StaticText(panel, label="Host:"), 0, wx.ALL, 5)
-        vbox.Add(self.host, 0, wx.EXPAND | wx.ALL, 5)
+        # Daten füllen
+        for row_idx, row in enumerate(data):
+            for col_idx, value in enumerate(row):
+                grid.SetCellValue(row_idx, col_idx, str(value))
 
-        vbox.Add(wx.StaticText(panel, label="Port:"), 0, wx.ALL, 5)
-        vbox.Add(self.port, 0, wx.EXPAND | wx.ALL, 5)
-
-        vbox.Add(check, 0, wx.EXPAND | wx.ALL, 10)
-
-        panel.SetSizer(vbox)
-
-        self.Show()
-
-    def check_port(self, event):
-        host = self.host.GetValue()
-        port = self.port.GetValue()
-
-        try:
-            sock = socket.socket()
-            sock.settimeout(1)
-
-            if sock.connect_ex((host, int(port))) == 0:
-                wx.MessageBox("Port ist offen ✅")
-            else:
-                wx.MessageBox("Port ist geschlossen ❌")
-
-            sock.close()
-
-        except:
-            wx.MessageBox("Fehler bei Eingabe")
+        sizer.Add(grid, 1, wx.EXPAND)
+        panel.SetSizer(sizer)
 
 app = wx.App()
-MyFrame()
+frame = MyFrame()
+frame.Show()
 app.MainLoop()
