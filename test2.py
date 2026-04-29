@@ -46,12 +46,7 @@ class MyFrame(wx.Frame):
             cb.my_port = port
             self.checkboxes.append(cb)
             grid.Add(cb, 0, wx.ALL, 3)
-        
-        port_input_box = wx.BoxSizer(wx.HORIZONTAL)
-        port_input_box.Add(wx.StaticText(panel, label="Custom Port:"), 0, wx.ALL | wx.CENTER, 5)
-        self.port_input = wx.TextCtrl(panel)
-        port_input_box.Add(self.port_input, 1, wx.EXPAND | wx.ALL, 5)
-        box_sizer.Add(port_input_box, 0, wx.EXPAND | wx.ALL, 5)
+
         box_sizer.Add(grid, 1, wx.ALL, 5)
         main.Add(box_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
@@ -78,25 +73,15 @@ class MyFrame(wx.Frame):
         self.Show()
 
     def check_port(self, event):
-        print(self.checkboxes)
-
-        ports = []
-        for cb in self.checkboxes:
-            if cb.getValue():
-                ports.append(cb.my_port)
-        for port in self.port_input.GetValue().split(","):
-            try:
-                ports.append(int(port.strip()))
-            except ValueError:
-                pass
         host = self.host.GetValue()
-        print(self.port_input.GetValue())
+
         close = wx.Colour(255, 180, 180)
         open_c = wx.Colour(180, 255, 180)
 
-        for port in ports:
-            print(port)
-            try:
+        for cb in self.checkboxes:
+            if cb.GetValue():
+                port = cb.my_port
+                try:
                     with socket.create_connection((host, port), timeout=5):
                         self.grid.AppendRows(1)
                         row = self.grid.GetNumberRows() - 1
@@ -106,15 +91,14 @@ class MyFrame(wx.Frame):
                         self.grid.SetCellBackgroundColour(row, 1, open_c)
                         self.grid.SetCellValue(row, 2, host)
 
-            except Exception:
-                self.grid.AppendRows(1)
-                row = self.grid.GetNumberRows() - 1
+                except Exception:
+                    self.grid.AppendRows(1)
+                    row = self.grid.GetNumberRows() - 1
 
-                self.grid.SetCellValue(row, 0, str(port))
-                self.grid.SetCellValue(row, 1, "Closed")
-                self.grid.SetCellBackgroundColour(row, 1, close)
-                self.grid.SetCellValue(row, 2, host)
-        self.host.SetValue("")
+                    self.grid.SetCellValue(row, 0, str(port))
+                    self.grid.SetCellValue(row, 1, "Closed")
+                    self.grid.SetCellBackgroundColour(row, 1, close)
+                    self.grid.SetCellValue(row, 2, host)
 
 
 app = wx.App()
