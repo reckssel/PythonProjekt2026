@@ -82,6 +82,7 @@ python main.py
 * Anzeige bekannter Dienste hinter Ports
 * Dark Mode
 
+
 ## Bekannte Standardports
 
 | Port  | Dienst    |
