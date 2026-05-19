@@ -78,35 +78,50 @@ class MyFrame(wx.Frame):
         self.Show()
 
     def check_port(self, event):
-        print(self.checkboxes)
+
+        # Alte Ergebnisse löschen
+        if self.grid.GetNumberRows() > 0:
+            self.grid.DeleteRows(0, self.grid.GetNumberRows())
 
         ports = []
+
+        # Checkboxen prüfen
         for cb in self.checkboxes:
-            if cb.getValue():
+            if cb.GetValue():   # <- FIX
                 ports.append(cb.my_port)
+
+        # Custom Ports
         for port in self.port_input.GetValue().split(","):
             try:
-                ports.append(int(port.strip()))
+                p = int(port.strip())
+                if p not in ports:
+                    ports.append(p)
             except ValueError:
                 pass
-        host = self.host.GetValue()
-        print(self.port_input.GetValue())
+
+        host = self.host.GetValue().strip()
+
+        if not host:
+            wx.MessageBox("Bitte Host eingeben!", "Fehler")
+            return
+
         close = wx.Colour(255, 180, 180)
         open_c = wx.Colour(180, 255, 180)
 
         for port in ports:
-            print(port)
             try:
-                    with socket.create_connection((host, port), timeout=5):
-                        self.grid.AppendRows(1)
-                        row = self.grid.GetNumberRows() - 1
+                with socket.create_connection((host, port), timeout=5):
 
-                        self.grid.SetCellValue(row, 0, str(port))
-                        self.grid.SetCellValue(row, 1, "Open")
-                        self.grid.SetCellBackgroundColour(row, 1, open_c)
-                        self.grid.SetCellValue(row, 2, host)
+                    self.grid.AppendRows(1)
+                    row = self.grid.GetNumberRows() - 1
+
+                    self.grid.SetCellValue(row, 0, str(port))
+                    self.grid.SetCellValue(row, 1, "Open")
+                    self.grid.SetCellBackgroundColour(row, 1, open_c)
+                    self.grid.SetCellValue(row, 2, host)
 
             except Exception:
+
                 self.grid.AppendRows(1)
                 row = self.grid.GetNumberRows() - 1
 
@@ -114,6 +129,7 @@ class MyFrame(wx.Frame):
                 self.grid.SetCellValue(row, 1, "Closed")
                 self.grid.SetCellBackgroundColour(row, 1, close)
                 self.grid.SetCellValue(row, 2, host)
+
         self.host.SetValue("")
 
 
